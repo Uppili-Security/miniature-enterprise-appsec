@@ -1,0 +1,203 @@
+
+name: Enterprise Application Security Pipeline
+
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - '**'
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  sast:
+    name: SAST - Semgrep
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Semgrep
+        run: pip install semgrep
+
+      - name: Run Semgrep scan
+        run: |
+          semgrep scan \
+            --config auto \
+            --sarif \
+            --output semgrep.sarif \
+            application/backend/
+
+      - name: Upload SARIF results
+        if: always() && hashFiles('semgrep.sarif') != ''
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: semgrep.sarif
+          category: semgrep
+
+  sca:
+    name: SCA - Trivy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Scan dependencies with Trivy
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: fs
+          scan-ref: application/backend/
+          scanners: vuln
+          severity: UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL
+          format: sarif
+          output: trivy-sca.sarif
+          exit-code: '0'
+
+      - name: Upload SCA results to GitHub Code Scanning
+        if: always() && hashFiles('trivy-sca.sarif') != ''
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: trivy-sca.sarif
+          category: trivy-sca
+  iac:
+    name: IaC Security - Checkov
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Run Checkov
+        uses: bridgecrewio/checkov-action@v12
+        with:
+          directory: infrastructure/terraform
+          framework: terraform
+          output_format: cli,sarif
+          output_file_path: console,checkov.sarif
+          soft_fail: true
+
+      - name: Upload Checkov results
+        if: always() && hashFiles('checkov.sarif') != ''
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: checkov.sarif
+          category: checkov-iac
+
+
+  dast:
+    name: DAST - OWASP ZAP
+    runs-on: ubuntu-latest
+    env:
+      DJANGO_SECRET_KEY: "ci-only-test-key-not-for-production"
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Django dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r application/backend/requirements.txt
+
+      - name: Apply database migrations
+        working-directory: application/backend
+        run: python manage.py migrate --noinput
+
+      - name: Start Django application
+        working-directory: application/backend
+        run: |
+          python manage.py runserver 0.0.0.0:8000 > django.log 2>&1 &
+          for i in {1..30}; do
+            if curl --fail http://127.0.0.1:8000/admin/login/; then
+              echo "Django application is ready"
+              exit 0
+            fi
+            sleep 2
+          done
+          cat django.log
+          exit 1
+
+      - name: Run OWASP ZAP baseline scan
+        continue-on-error: true
+        run: |
+          docker run --network host \
+            -v "$PWD:/zap/wrk/:rw" \
+            ghcr.io/zaproxy/zaproxy:stable \
+            zap-baseline.py \
+            -t http://127.0.0.1:8000 \
+            -J zap-report.json \
+            -r zap-report.html
+
+      - name: Upload ZAP reports
+        if: always() && hashFiles('zap-report.*') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: owasp-zap-reports
+          path: zap-report.*
+          if-no-files-found: ignore
+
+
+  secrets:
+    name: Secrets Scanning - Gitleaks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository history
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Run Gitleaks
+        uses: gitleaks/gitleaks-action@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_ENABLE_COMMENTS: false
+
+
+  container-security:
+    name: Container Security - Trivy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: |
+          docker build \
+            -t miniature-enterprise-appsec:${{ github.sha }} \
+            ./application/backend
+
+      - name: Scan Docker image with Trivy
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: miniature-enterprise-appsec:${{ github.sha }}
+          format: sarif
+          output: trivy-container.sarif
+          severity: UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL
+          vuln-type: os,library
+          scanners: vuln,secret
+          exit-code: '0'
+
+      - name: Upload container scan results
+        if: always() && hashFiles('trivy-container.sarif') != ''
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: trivy-container.sarif
+          category: trivy-container

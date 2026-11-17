@@ -1,15 +1,13 @@
 
 # Miniature Enterprise AppSec
 
-**An open-source, enterprise-inspired Application Security ecosystem.**
+An open-source, enterprise-inspired Application Security ecosystem demonstrating how organisations integrate security into the Software Development Life Cycle (SDLC).
 
-Miniature Enterprise AppSec aims to demonstrate how organisations design, implement, automate, and manage Application Security across the entire Software Development Life Cycle (SDLC).
-
-The project brings together open-source security tools, DevSecOps practices, vulnerability management, secrets management, cloud security, security governance, and automation into a unified, reproducible environment.
+Miniature Enterprise AppSec brings together open-source security tools, DevSecOps practices, vulnerability management, infrastructure security, automation, and security governance into a unified, reproducible environment.
 
 Rather than demonstrating individual security scanners in isolation, this project focuses on building an integrated Application Security programme inspired by real-world enterprise security operations.
 
-> **Project status:** Under active development. Capabilities will be implemented incrementally. See the roadmap for planned features.
+**Project status:** Under active development. Capabilities are implemented incrementally.
 
 ---
 
@@ -17,46 +15,100 @@ Rather than demonstrating individual security scanners in isolation, this projec
 
 - Demonstrate an end-to-end enterprise-inspired Application Security programme.
 - Integrate security throughout the Software Development Life Cycle.
-- Automate security testing and enforcement within CI/CD pipelines.
-- Establish centralised vulnerability management and risk prioritisation.
-- Demonstrate enterprise secrets and cryptographic key management.
+- Automate security testing within CI/CD pipelines.
+- Demonstrate vulnerability discovery, prioritisation, and remediation.
 - Secure applications, APIs, containers, infrastructure, and cloud environments.
-- Implement security governance, exception management, and auditability.
+- Demonstrate security governance and risk management practices.
 - Improve developer security experience through automation and self-service.
 - Provide reusable reference architectures, configurations, and documentation.
 
-## Security Capabilities
+## Current Implementation
 
-The project is organised into the following security domains.
+The repository currently includes the following components.
 
-| Domain | Planned capabilities |
-|---|---|
-| Secure SDLC | Security requirements, threat modelling, architecture reviews, secure coding |
-| SAST | Static application security testing and custom security rules |
-| SCA | Dependency analysis, vulnerability detection, and dependency governance |
-| DAST | Dynamic application security testing and API security testing |
-| Secrets Security | Secret detection, centralised storage, rotation, and revocation |
-| API Security | Authentication, authorisation, API vulnerability testing |
-| IaC Security | Terraform, Kubernetes, and infrastructure misconfiguration scanning |
-| Container Security | Image scanning, hardening, and runtime security |
-| Cloud Security | IAM, cloud misconfiguration detection, and security posture |
-| Supply Chain Security | SBOM, artifact signing, provenance, and dependency integrity |
-| Vulnerability Management | Finding aggregation, prioritisation, remediation, and verification |
-| ASPM | Application security posture visibility and risk management |
-| Governance | Security policies, risk acceptance, exceptions, and audit trails |
-| Security Operations | Incident response, vulnerability management, and security monitoring |
-| Security Champions | Developer enablement, security training, and programme management |
-| Automation | Ticket creation, notifications, reporting, and workflow automation |
-| AI Security | AI application security, RAG security, and AI-powered security assistance |
-| Metrics & Reporting | Security KPIs, KRIs, vulnerability trends, and management dashboards |
+| Security Domain | Implementation | Technology |
+|---|---|---|
+| Sample Application | REST APIs, authentication, projects and tasks | Python, Django, Django REST Framework |
+| Authentication | JWT authentication and token management | Simple JWT |
+| SAST | Static application security scanning | Semgrep |
+| SCA | Dependency vulnerability scanning | Trivy |
+| DAST | Dynamic application security testing | OWASP ZAP |
+| Secrets Detection | Repository secrets scanning | Gitleaks |
+| IaC Security | Terraform misconfiguration scanning | Checkov |
+| Container Security | Container image vulnerability and secret scanning | Trivy |
+| CI/CD Security | Automated security pipeline | GitHub Actions |
+
+### Security Demonstration Application
+
+The Django application provides a controlled environment for demonstrating application security weaknesses.
+
+Implemented functionality includes:
+
+- User registration and JWT authentication.
+- Project CRUD APIs.
+- Task CRUD APIs.
+- Security demonstration endpoints.
+
+The application also includes intentionally vulnerable scenarios for security testing and learning, including:
+
+- SQL injection demonstrations.
+- Blind SQL injection demonstrations.
+- Cross-site scripting patterns.
+- SSRF-related input handling patterns.
+- Path traversal-related input handling patterns.
+- Command injection-related patterns.
+- Insecure deserialization patterns.
+- Broken Object Level Authorization (BOLA).
+- Broken Function Level Authorization (BFLA).
+
+Some demonstration endpoints illustrate potentially dangerous coding patterns rather than fully exploitable vulnerabilities. Their limitations and testing methodology should be documented alongside the relevant demonstrations.
+
+**Important:** The vulnerable application and infrastructure fixtures are intended for isolated testing only. They must not be exposed to public networks or deployed to production.
+
+## Security Pipeline
+
+The project uses GitHub Actions to execute automated security checks.
+
+The current pipeline contains six independent jobs:
+
+| Job | Tool | Purpose |
+|---|---|---|
+| SAST | Semgrep | Identify insecure coding patterns |
+| SCA | Trivy | Identify vulnerable dependencies |
+| IaC Security | Checkov | Identify Terraform misconfigurations |
+| DAST | OWASP ZAP | Test the running Django application |
+| Secrets Scanning | Gitleaks | Detect accidentally committed secrets |
+| Container Security | Trivy | Scan container images for vulnerabilities and secrets |
+
+Security findings are reported through GitHub Code Scanning where supported. ZAP reports are uploaded as workflow artifacts.
+
+The initial pipeline focuses on detection and reporting. Security enforcement and severity-based blocking will be introduced incrementally.
+
+## Architecture
+
+The intended architecture consists of three interconnected layers.
+
+### 1. Application and Infrastructure Layer
+
+A sample application and supporting infrastructure containing intentionally vulnerable and secure implementations.
+
+### 2. Security Testing and Enforcement Layer
+
+Automated and manual security controls integrated throughout the development and deployment lifecycle.
+
+### 3. Security Operations Layer
+
+Centralised vulnerability management, risk tracking, security governance, automation, and reporting.
+
+The architecture will evolve as additional capabilities are implemented.
 
 ## Technology Stack
 
-The project will prioritise open-source technologies.
+The project prioritises open-source technologies.
 
-| Security Area | Planned Tools |
+| Security Area | Tools |
 |---|---|
-| Application | Java, Spring Boot |
+| Application | Python, Django, Django REST Framework |
 | CI/CD | GitHub Actions |
 | SAST | Semgrep, CodeQL |
 | SCA | Trivy, OWASP Dependency-Check |
@@ -75,59 +127,128 @@ The project will prioritise open-source technologies.
 | Cloud | AWS |
 | Threat Modelling | OWASP Threat Dragon / STRIDE |
 
-Tool selection may evolve as the project develops. Each integration will document its purpose, configuration, limitations, and licensing.
-
-## Architecture
-
-The intended architecture consists of three interconnected layers.
-
-### 1. Application and Infrastructure Layer
-
-A sample application and supporting infrastructure containing both intentionally vulnerable and secure implementations.
-
-### 2. Security Testing and Enforcement Layer
-
-Automated and manual security controls integrated throughout the development and deployment lifecycle.
-
-### 3. Security Operations Layer
-
-Centralised vulnerability management, secrets management, risk tracking, security governance, automation, and reporting.
-
-The architecture and deployment documentation will evolve alongside implementation.
+The technology stack represents both implemented and planned integrations. Individual components will document their purpose, configuration, limitations, and licensing.
 
 ## Project Roadmap
 
-The project will be developed incrementally through the following milestones.
+The project will be developed incrementally.
 
-- [ ] Repository foundation and architecture
-- [ ] Sample application and secure SDLC
-- [ ] GitHub Actions and CI/CD security
-- [ ] SAST, SCA, and secrets detection
-- [ ] DAST and API security
-- [ ] IaC, container, and Kubernetes security
+### Foundation and Application Security
+
+- [x] Repository foundation and initial architecture
+- [x] Django sample application
+- [x] JWT authentication
+- [x] Project and Task CRUD APIs
+- [x] Security demonstration endpoints
+- [x] Dockerfile and container build
+- [x] GitHub Actions security pipeline
+- [x] SAST integration
+- [x] SCA integration
+- [x] Secrets detection integration
+- [x] DAST integration
+- [x] IaC security integration
+- [x] Container security integration
+
+### Future Enhancements
+
+- [ ] Secure SDLC and threat modelling
+- [ ] Security testing for authentication and authorisation
+- [ ] API security testing and automation
+- [ ] Security gates and severity-based enforcement
+- [ ] Kubernetes security
 - [ ] Cloud security
-- [ ] SBOM and software supply-chain security
+- [ ] SBOM generation and software supply-chain security
 - [ ] Secrets and cryptographic key management
-- [ ] Vulnerability management and ASPM
+- [ ] Centralised vulnerability management
+- [ ] Application Security Posture Management (ASPM)
 - [ ] Security governance and risk management
 - [ ] Security operations and incident response
 - [ ] Security automation and developer experience
+- [ ] Security Champions programme
 - [ ] AI-powered security assistant
 - [ ] Security metrics and dashboards
 - [ ] Documentation and community release
-
-See the repository issues and project board for implementation progress.
 
 ## Getting Started
 
 The project is currently under development.
 
-Deployment instructions, prerequisites, configuration examples, and demonstrations will be added as individual components become available.
+### Prerequisites
 
-The intended deployment options are:
+- Python 3.12+
+- Git
+- Docker Desktop (for container-related demonstrations)
 
-- **Quick Start:** A lightweight local environment for developers and security enthusiasts.
-- **Enterprise Simulation:** A more comprehensive environment demonstrating integrated enterprise AppSec capabilities.
+### Run the Django Application Locally
+
+Clone the repository:
+
+```bash
+git clone https://github.com/<your-username>/miniature-enterprise-appsec.git
+cd miniature-enterprise-appsec
+```
+
+Navigate to the backend:
+
+```bash
+cd application/backend
+```
+
+Create and activate a virtual environment:
+
+```bash
+python -m venv .venv
+```
+
+Windows PowerShell:
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+```
+
+Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+Create your environment file:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+Generate a Django secret key:
+
+```powershell
+python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+```
+
+Add the generated value to `.env`:
+
+```env
+DJANGO_SECRET_KEY=your-generated-secret-key
+```
+
+Apply migrations:
+
+```powershell
+python manage.py migrate
+```
+
+Start the application:
+
+```powershell
+python manage.py runserver
+```
+
+The application will be available at:
+
+```text
+http://127.0.0.1:8000/
+```
+
+The security pipeline is executed through GitHub Actions when changes are pushed or pull requests are opened.
 
 ## Security Philosophy
 
@@ -146,9 +267,9 @@ This project follows several core principles:
 
 Contributions, suggestions, feature requests, and improvements are welcome.
 
-Please refer to `CONTRIBUTING.md` for contribution guidelines once available.
+Whether you are an Application Security Engineer, security researcher, developer, or DevSecOps practitioner, you are welcome to contribute.
 
-Whether you are an application security engineer, security researcher, developer, or DevSecOps practitioner, you are welcome to contribute.
+Please open an issue to discuss significant changes before submitting a pull request.
 
 ## Disclaimer
 
