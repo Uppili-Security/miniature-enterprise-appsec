@@ -45,6 +45,14 @@ jobs:
           sarif_file: semgrep.sarif
           category: semgrep
 
+      - name: Save Semgrep report
+        if: always() && hashFiles('semgrep.sarif') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: semgrep-report
+          path: semgrep.sarif
+          if-no-files-found: ignore
+
   sca:
     name: SCA - Trivy
     runs-on: ubuntu-latest
@@ -70,6 +78,14 @@ jobs:
         with:
           sarif_file: trivy-sca.sarif
           category: trivy-sca
+
+      - name: Save Trivy SCA report
+        if: always() && hashFiles('trivy-sca.sarif') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-sca-report
+          path: trivy-sca.sarif
+          if-no-files-found: ignore
   iac:
     name: IaC Security - Checkov
     runs-on: ubuntu-latest
@@ -93,7 +109,13 @@ jobs:
         with:
           sarif_file: checkov.sarif
           category: checkov-iac
-
+      - name: Save Checkov report
+        if: always() && hashFiles('checkov.sarif') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: checkov-report
+          path: checkov.sarif
+          if-no-files-found: ignore
 
   dast:
     name: DAST - OWASP ZAP
@@ -204,3 +226,10 @@ jobs:
         with:
           sarif_file: trivy-container.sarif
           category: trivy-container
+      - name: Save Trivy container report
+        if: always() && hashFiles('trivy-container.sarif') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-container-report
+          path: trivy-container.sarif
+          if-no-files-found: ignore
