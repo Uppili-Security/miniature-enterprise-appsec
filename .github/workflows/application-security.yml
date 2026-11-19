@@ -136,20 +136,23 @@ jobs:
       - name: Run OWASP ZAP baseline scan
         continue-on-error: true
         run: |
+          mkdir -p zap-work
+          chmod 777 zap-work
+
           docker run --network host \
-            -v "$PWD:/zap/wrk/:rw" \
+            -v "$PWD/zap-work:/zap/wrk/:rw" \
             ghcr.io/zaproxy/zaproxy:stable \
             zap-baseline.py \
-            -t http://127.0.0.1:8000 \
+            -t http://127.0.0.1:8000/admin/login/ \
             -J zap-report.json \
             -r zap-report.html
 
       - name: Upload ZAP reports
-        if: always() && hashFiles('zap-report.*') != ''
+        if: always() && hashFiles('zap-work/zap-report.*') != ''
         uses: actions/upload-artifact@v4
         with:
           name: owasp-zap-reports
-          path: zap-report.*
+          path: zap-work/zap-report.*
           if-no-files-found: ignore
 
 
