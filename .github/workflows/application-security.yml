@@ -61,6 +61,17 @@ jobs:
     steps:
       - name: Checkout source code
         uses: actions/checkout@v4
+      - name: Check dependency manifests
+        run: |
+          echo "Checking Python dependency manifests..."
+          find application/backend -type f \( \
+            -name "requirements.txt" -o \
+            -name "pyproject.toml" -o \
+            -name "Pipfile.lock" \
+          \) -print
+
+          echo "Checking requirements.txt contents..."
+          cat application/backend/requirements.txt
 
       - name: Scan dependencies with Trivy
         uses: aquasecurity/trivy-action@v0.36.0
@@ -234,14 +245,4 @@ jobs:
           name: trivy-container-report
           path: trivy-container.sarif
           if-no-files-found: ignore
-      - name: Check dependency manifests
-        run: |
-          echo "Checking Python dependency manifests..."
-          find application/backend -type f \( \
-            -name "requirements.txt" -o \
-            -name "pyproject.toml" -o \
-            -name "Pipfile.lock" \
-          \) -print
-
-          echo "Checking requirements.txt contents..."
-          cat application/backend/requirements.txt
+     
