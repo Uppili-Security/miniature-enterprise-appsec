@@ -85,6 +85,21 @@ jobs:
           format: sarif
           output: trivy-sca.sarif
           exit-code: '0'
+      
+      - name: Debug Trivy filesystem scan
+        run: |
+          echo "Trivy version:"
+          trivy --version
+
+          echo "Python dependency files:"
+          find application/backend -type f -name "requirements*.txt"
+
+          echo "Run direct Trivy scan:"
+          trivy fs \
+            --debug \
+            --scanners vuln \
+            --format table \
+            application/backend/
 
       - name: Upload SCA results to GitHub Code Scanning
         if: always() && hashFiles('trivy-sca.sarif') != ''
