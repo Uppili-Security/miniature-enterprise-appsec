@@ -12,6 +12,7 @@ on:
 permissions:
   contents: read
   security-events: write
+  actions: read
 
 jobs:
   sast:
@@ -233,3 +234,14 @@ jobs:
           name: trivy-container-report
           path: trivy-container.sarif
           if-no-files-found: ignore
+      - name: Check dependency manifests
+        run: |
+          echo "Checking Python dependency manifests..."
+          find application/backend -type f \( \
+            -name "requirements.txt" -o \
+            -name "pyproject.toml" -o \
+            -name "Pipfile.lock" \
+          \) -print
+
+          echo "Checking requirements.txt contents..."
+          cat application/backend/requirements.txt
