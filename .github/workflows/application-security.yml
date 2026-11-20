@@ -75,6 +75,8 @@ jobs:
 
       - name: Scan dependencies with Trivy
         uses: aquasecurity/trivy-action@v0.36.0
+        env:
+          TRIVY_DEBUG: true
         with:
           scan-type: fs
           scan-ref: application/backend/
