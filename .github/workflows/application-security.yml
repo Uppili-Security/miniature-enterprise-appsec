@@ -101,6 +101,21 @@ jobs:
             --list-all-pkgs \
             --format table \
             application/backend/
+      
+      - name: Inspect Trivy SCA results
+        run: |
+          trivy fs \
+            --scanners vuln \
+            --format json \
+            --output trivy-debug.json \
+            application/backend/
+
+          echo "Trivy vulnerability results:"
+          jq '.Results[]? | {
+            Target: .Target,
+            Type: .Type,
+            Vulnerabilities: .Vulnerabilities
+          }' trivy-debug.json
 
       - name: Upload SCA results to GitHub Code Scanning
         if: always() && hashFiles('trivy-sca.sarif') != ''
