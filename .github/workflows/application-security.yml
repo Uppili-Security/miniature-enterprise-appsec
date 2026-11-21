@@ -12,6 +12,7 @@ on:
 permissions:
   contents: read
   security-events: write
+  actions: read
 
 jobs:
   sast:
@@ -45,6 +46,14 @@ jobs:
           sarif_file: semgrep.sarif
           category: semgrep
 
+      - name: Save Semgrep report
+        if: always() && hashFiles('semgrep.sarif') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: semgrep-report
+          path: semgrep.sarif
+          if-no-files-found: ignore
+
   sca:
     name: SCA - Trivy
     runs-on: ubuntu-latest
@@ -52,7 +61,6 @@ jobs:
     steps:
       - name: Checkout source code
         uses: actions/checkout@v4
-
       - name: Scan dependencies with Trivy
         uses: aquasecurity/trivy-action@v0.36.0
         with:
@@ -63,13 +71,20 @@ jobs:
           format: sarif
           output: trivy-sca.sarif
           exit-code: '0'
-
       - name: Upload SCA results to GitHub Code Scanning
         if: always() && hashFiles('trivy-sca.sarif') != ''
         uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: trivy-sca.sarif
           category: trivy-sca
+
+      - name: Save Trivy SCA report
+        if: always() && hashFiles('trivy-sca.sarif') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-sca-report
+          path: trivy-sca.sarif
+          if-no-files-found: ignore
   iac:
     name: IaC Security - Checkov
     runs-on: ubuntu-latest
@@ -93,7 +108,13 @@ jobs:
         with:
           sarif_file: checkov.sarif
           category: checkov-iac
-
+      - name: Save Checkov report
+        if: always() && hashFiles('checkov.sarif') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: checkov-report
+          path: checkov.sarif
+          if-no-files-found: ignore
 
   dast:
     name: DAST - OWASP ZAP
@@ -136,20 +157,23 @@ jobs:
       - name: Run OWASP ZAP baseline scan
         continue-on-error: true
         run: |
+          mkdir -p zap-work
+          chmod 777 zap-work
+
           docker run --network host \
-            -v "$PWD:/zap/wrk/:rw" \
+            -v "$PWD/zap-work:/zap/wrk/:rw" \
             ghcr.io/zaproxy/zaproxy:stable \
             zap-baseline.py \
-            -t http://127.0.0.1:8000 \
+            -t http://127.0.0.1:8000/admin/login/ \
             -J zap-report.json \
             -r zap-report.html
 
       - name: Upload ZAP reports
-        if: always() && hashFiles('zap-report.*') != ''
+        if: always() && hashFiles('zap-work/zap-report.*') != ''
         uses: actions/upload-artifact@v4
         with:
           name: owasp-zap-reports
-          path: zap-report.*
+          path: zap-work/zap-report.*
           if-no-files-found: ignore
 
 
@@ -201,3 +225,11 @@ jobs:
         with:
           sarif_file: trivy-container.sarif
           category: trivy-container
+      - name: Save Trivy container report
+        if: always() && hashFiles('trivy-container.sarif') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-container-report
+          path: trivy-container.sarif
+          if-no-files-found: ignore
+     
