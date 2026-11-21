@@ -1,56 +1,95 @@
+Miniature Enterprise AppSec
+An open-source, enterprise-inspired Application Security ecosystem
+demonstrating how organisations integrate security into the Software
+Development Life Cycle (SDLC).
 
-# Miniature Enterprise AppSec
+Miniature Enterprise AppSec brings together open-source security tools,
+DevSecOps practices, vulnerability management, infrastructure security,
+automation, and security governance into a unified, reproducible
+environment.
 
-An open-source, enterprise-inspired Application Security ecosystem demonstrating how organisations integrate security into the Software Development Life Cycle (SDLC).
+Rather than demonstrating individual security scanners in isolation,
+this project focuses on building an integrated Application Security
+programme inspired by real-world enterprise security operations.
 
-Miniature Enterprise AppSec brings together open-source security tools, DevSecOps practices, vulnerability management, infrastructure security, automation, and security governance into a unified, reproducible environment.
-
-Rather than demonstrating individual security scanners in isolation, this project focuses on building an integrated Application Security programme inspired by real-world enterprise security operations.
-
-**Project status:** Under active development. Capabilities are implemented incrementally.
-
----
-
-## Objectives
-
-- Demonstrate an end-to-end enterprise-inspired Application Security programme.
+Project status: Under active development. The foundation,
+six-scanner GitHub Actions pipeline, and consolidated HTML security
+dashboard are implemented. Additional capabilities are being developed
+incrementally.
+Objectives
+- Demonstrate an end-to-end enterprise-inspired Application Security
+  programme.
 - Integrate security throughout the Software Development Life Cycle.
 - Automate security testing within CI/CD pipelines.
-- Demonstrate vulnerability discovery, prioritisation, and remediation.
-- Secure applications, APIs, containers, infrastructure, and cloud environments.
+- Demonstrate vulnerability discovery, prioritisation, and
+  remediation.
+- Secure applications, APIs, containers, infrastructure, and cloud
+  environments.
 - Demonstrate security governance and risk management practices.
-- Improve developer security experience through automation and self-service.
-- Provide reusable reference architectures, configurations, and documentation.
-
-## Current Implementation
-
+- Improve developer security experience through automation and
+  self-service.
+- Provide reusable reference architectures, configurations, and
+  documentation.
+Current Implementation
 The repository currently includes the following components.
+  Security Domain   Implementation     Technology        Status
+  Sample            REST APIs and      Python, Django,   Implemented
+Application       authentication,    Django REST
+with project/task  Framework
+functionality                        
 
-| Security Domain | Implementation | Technology |
-|---|---|---|
-| Sample Application | REST APIs, authentication, projects and tasks | Python, Django, Django REST Framework |
-| Authentication | JWT authentication and token management | Simple JWT |
-| SAST | Static application security scanning | Semgrep |
-| SCA | Dependency vulnerability scanning | Trivy |
-| DAST | Dynamic application security testing | OWASP ZAP |
-| Secrets Detection | Repository secrets scanning | Gitleaks |
-| IaC Security | Terraform misconfiguration scanning | Checkov |
-| Container Security | Container image vulnerability and secret scanning | Trivy |
-| CI/CD Security | Automated security pipeline | GitHub Actions |
+  Authentication    JWT authentication Simple JWT        Implemented
+and token
+management                           
 
-### Security Demonstration Application
+  SAST              Static application Semgrep           Integrated in CI
+security scanning                    
 
-The Django application provides a controlled environment for demonstrating application security weaknesses.
+  SCA               Dependency         Trivy             Integrated in CI
+vulnerability
+scanning                             
+
+  DAST              Dynamic            OWASP ZAP         Integrated in CI
+application
+security testing
+against the
+running Django
+application                          
+
+  Secrets Detection Repository secrets Gitleaks          Integrated in CI
+scanning                             
+
+  IaC Security      Terraform          Checkov           Integrated in CI
+misconfiguration
+scanning                             
+
+  Container         Container image    Trivy             Integrated in CI
+Security          vulnerability and
+secret scanning                      
+
+  CI/CD Security    Automated security GitHub Actions    Implemented
+pipeline on pushes
+and pull requests                    
+
+  Security          Collection and     Python, SARIF,    Implemented
+Reporting         parsing of scanner JSON
+output                               
+Security          Consolidated       Python, HTML,     Implemented
+Dashboard         interactive HTML   JavaScript
+dashboard uploaded
+as a workflow
+artifact
+Security Demonstration Application
+The Django application provides a controlled environment for
+demonstrating application security weaknesses.
 
 Implemented functionality includes:
-
 - User registration and JWT authentication.
 - Project CRUD APIs.
 - Task CRUD APIs.
 - Security demonstration endpoints.
-
-The application also includes intentionally vulnerable scenarios for security testing and learning, including:
-
+The application also includes intentionally vulnerable scenarios for
+security testing and learning, including:
 - SQL injection demonstrations.
 - Blind SQL injection demonstrations.
 - Cross-site scripting patterns.
@@ -60,81 +99,176 @@ The application also includes intentionally vulnerable scenarios for security te
 - Insecure deserialization patterns.
 - Broken Object Level Authorization (BOLA).
 - Broken Function Level Authorization (BFLA).
+Some demonstration endpoints illustrate potentially dangerous coding
+patterns rather than fully exploitable vulnerabilities. Their
+limitations and testing methodology should be documented alongside the
+relevant demonstrations.
 
-Some demonstration endpoints illustrate potentially dangerous coding patterns rather than fully exploitable vulnerabilities. Their limitations and testing methodology should be documented alongside the relevant demonstrations.
-
-**Important:** The vulnerable application and infrastructure fixtures are intended for isolated testing only. They must not be exposed to public networks or deployed to production.
-
-## Security Pipeline
-
+Important: The vulnerable application and infrastructure fixtures
+are intended for isolated testing only. They must not be exposed to
+public networks or deployed to production.
+Security Pipeline
 The project uses GitHub Actions to execute automated security checks.
+The workflow runs on pushes and pull requests across branches.
 
-The current pipeline contains six independent jobs:
+The pipeline contains six independent scanner jobs and a consolidated
+reporting job.
+  Job                     Tool                    Purpose
+  SAST                    Semgrep                 Identify insecure
+coding patterns
 
-| Job | Tool | Purpose |
-|---|---|---|
-| SAST | Semgrep | Identify insecure coding patterns |
-| SCA | Trivy | Identify vulnerable dependencies |
-| IaC Security | Checkov | Identify Terraform misconfigurations |
-| DAST | OWASP ZAP | Test the running Django application |
-| Secrets Scanning | Gitleaks | Detect accidentally committed secrets |
-| Container Security | Trivy | Scan container images for vulnerabilities and secrets |
+  SCA                     Trivy                   Identify vulnerable
+application
+dependencies
 
-Security findings are reported through GitHub Code Scanning where supported. ZAP reports are uploaded as workflow artifacts.
+  IaC Security            Checkov                 Identify Terraform
+misconfigurations
 
-The initial pipeline focuses on detection and reporting. Security enforcement and severity-based blocking will be introduced incrementally.
+  DAST                    OWASP ZAP               Test the running Django
+application
 
-## Architecture
+  Secrets Scanning        Gitleaks                Detect accidentally
+committed secrets
 
-The intended architecture consists of three interconnected layers.
+  Container Security      Trivy                   Scan container images
+for vulnerabilities and
+secrets
+Consolidated Reporting  Python reporting        Collect scanner
+scripts                 artifacts and generate
+the HTML dashboard
+Pipeline behaviour
+1. GitHub Actions starts the scanner jobs for a push or pull request.
+2. Scanner jobs execute independently and upload their available
+   reports as workflow artifacts. SARIF results are also uploaded to
+   GitHub Code Scanning where configured and supported.
+3. The reporting job runs after the scanner jobs, including when one or
+   more scanner jobs fail.
+4. The reporting job downloads available scanner artifacts into a
+   common directory structure.
+5. The Python parser processes SARIF and OWASP ZAP JSON reports and
+   produces consolidated findings in JSON.
+6. The dashboard generator converts the consolidated findings into an
+   interactive HTML report.
+7. The HTML dashboard is uploaded as the
+   enterprise-security-dashboard workflow artifact.
+The dashboard artifact is configured with a 14-day retention period. It
+can be downloaded from the Artifacts section of the relevant GitHub
+Actions workflow run. It is not currently embedded directly in the pull
+request conversation.
 
-### 1. Application and Infrastructure Layer
+The initial pipeline focuses on detection and reporting. Security
+enforcement and severity-based blocking will be introduced
+incrementally. A successful workflow run indicates that the jobs
+completed; it does not mean that the scanned code has no security
+findings.
+Consolidated Security Dashboard
+The reporting implementation is maintained under security-reporting/.
+  File                                Responsibility
+  generate_report.py                Discovers and parses scanner
+SARIF/JSON reports and consolidates
+findings
 
-A sample application and supporting infrastructure containing intentionally vulnerable and secure implementations.
+  generate_dashboard.py             Generates the interactive HTML
+security dashboard
+requirements.txt                  Python dependencies used by the
+reporting scripts
+The dashboard currently provides:
+- Executive summary metrics, including total findings and severity
+  counts.
+- Scanner coverage and execution status.
+- Findings grouped and ordered by severity.
+- Scanner and severity filters.
+- Text search across findings.
+- Expandable finding details, including available vulnerability
+  identifiers, affected packages/resources, descriptions, and
+  remediation guidance.
+The parser uses severity metadata supplied by scanner reports where
+available. Findings without reliable severity metadata are retained as
+Unknown rather than being assigned an assumed severity.
+Generate the dashboard locally
+Run the scanners or place their supported output files under
+security-reporting/scan-reports/ using the scanner-specific directory
+structure expected by the parser.
 
-### 2. Security Testing and Enforcement Layer
+From the repository root, run:
+python security-reporting/generate_report.py \
+  --input security-reporting/scan-reports \
+  --output security-reporting/parsed-findings.json
+Then generate the HTML dashboard:
+python security-reporting/generate_dashboard.py \
+  --input security-reporting/parsed-findings.json \
+  --output security-reporting/enterprise-security-report.html
+Open security-reporting/enterprise-security-report.html in a web
+browser.
 
-Automated and manual security controls integrated throughout the development and deployment lifecycle.
+Generated scanner reports, consolidated JSON, and HTML output are
+local/generated artifacts and should not be committed as source files.
+Architecture
+The diagram below shows the currently implemented application security workflow, from developer changes through automated scanning, report consolidation, and dashboard publication.
 
-### 3. Security Operations Layer
+The editable draw.io source is available at [`docs/architecture/appsec-architecture.drawio`](docs/architecture/appsec-architecture.drawio).
+Architecture flow
+1. Developers push changes or open pull requests.
+2. GitHub Actions runs the six integrated security scanners: Semgrep, Trivy filesystem (SCA), Checkov, OWASP ZAP, Gitleaks, and Trivy container scanning.
+3. Scanner outputs are collected as workflow artifacts in supported SARIF and JSON formats.
+4. The Python reporting scripts parse and consolidate the available results.
+5. The dashboard generator creates an interactive HTML security dashboard.
+6. GitHub Actions publishes the dashboard as the enterprise-security-dashboard artifact, with a 14-day retention period.
+The Django demonstration application is the application under test. The dashed future-extension area in the diagram represents planned capabilities, not currently implemented integrations.
 
-Centralised vulnerability management, risk tracking, security governance, automation, and reporting.
-
-The architecture will evolve as additional capabilities are implemented.
-
-## Technology Stack
-
+Current implementation: The sample Django application, six-scanner GitHub Actions pipeline, and consolidated reporting dashboard form the initial working implementation. Broader security operations and governance capabilities remain part of the project direction.
+Technology Stack
 The project prioritises open-source technologies.
+  Security Area                       Tools
+  Application                         Python, Django, Django REST
+Framework
 
-| Security Area | Tools |
-|---|---|
-| Application | Python, Django, Django REST Framework |
-| CI/CD | GitHub Actions |
-| SAST | Semgrep, CodeQL |
-| SCA | Trivy, OWASP Dependency-Check |
-| Secrets Detection | Gitleaks |
-| Secrets Management | HashiCorp Vault / OpenBao |
-| DAST | OWASP ZAP |
-| API Security | OWASP ZAP, Burp Suite Community |
-| IaC Security | Checkov |
-| Container Security | Trivy |
-| SBOM | CycloneDX, SPDX |
-| SBOM Management | OWASP Dependency-Track |
-| Vulnerability Management | OWASP DefectDojo |
-| Artifact Signing | Cosign / Sigstore |
-| Automation | n8n |
-| Infrastructure | Docker, Terraform, Kubernetes |
-| Cloud | AWS |
-| Threat Modelling | OWASP Threat Dragon / STRIDE |
+  CI/CD                               GitHub Actions
 
-The technology stack represents both implemented and planned integrations. Individual components will document their purpose, configuration, limitations, and licensing.
+  SAST                                Semgrep, CodeQL (planned)
 
-## Project Roadmap
+  SCA                                 Trivy, OWASP Dependency-Check
+(planned)
 
-The project will be developed incrementally.
+  Secrets Detection                   Gitleaks
 
-### Foundation and Application Security
+  Secrets Management                  HashiCorp Vault / OpenBao (planned)
 
+  DAST                                OWASP ZAP
+
+  API Security                        OWASP ZAP, Burp Suite Community
+(planned integration/workflow)
+
+  IaC Security                        Checkov
+
+  Container Security                  Trivy
+
+  SBOM                                CycloneDX, SPDX (planned)
+
+  SBOM Management                     OWASP Dependency-Track (planned)
+
+  Vulnerability Management            OWASP DefectDojo (planned)
+
+  Artifact Signing                    Cosign / Sigstore (planned)
+
+  Automation                          n8n (planned)
+
+  Infrastructure                      Docker, Terraform, Kubernetes
+(Kubernetes integration planned)
+
+  Cloud                               AWS (planned security scenarios)
+
+  Threat Modelling                    OWASP Threat Dragon / STRIDE
+(planned)
+Reporting                           Python, SARIF, JSON, HTML
+The technology stack represents both implemented and planned
+integrations. Individual components will document their purpose,
+configuration, limitations, and licensing.
+Project Roadmap
+The project will be developed incrementally. Checkmarks indicate
+capabilities currently implemented in the repository and pipeline;
+unchecked items remain future work.
+Foundation and Application Security
 - [x] Repository foundation and initial architecture
 - [x] Django sample application
 - [x] JWT authentication
@@ -142,19 +276,24 @@ The project will be developed incrementally.
 - [x] Security demonstration endpoints
 - [x] Dockerfile and container build
 - [x] GitHub Actions security pipeline
-- [x] SAST integration
-- [x] SCA integration
-- [x] Secrets detection integration
-- [x] DAST integration
-- [x] IaC security integration
-- [x] Container security integration
-
-### Future Enhancements
-
+- [x] SAST integration (Semgrep)
+- [x] SCA integration (Trivy)
+- [x] Secrets detection integration (Gitleaks)
+- [x] DAST integration (OWASP ZAP)
+- [x] IaC security integration (Checkov)
+- [x] Container security integration (Trivy)
+- [x] Scanner report collection and parsing
+- [x] Consolidated security findings JSON generation
+- [x] Interactive HTML security dashboard
+- [x] Dashboard artifact publishing in GitHub Actions
+- [x] Dashboard generation on push, pull request, and merge-triggered
+  workflow runs
+Future Enhancements
 - [ ] Secure SDLC and threat modelling
 - [ ] Security testing for authentication and authorisation
 - [ ] API security testing and automation
 - [ ] Security gates and severity-based enforcement
+- [ ] PR-level security feedback and introduced-finding analysis
 - [ ] Kubernetes security
 - [ ] Cloud security
 - [ ] SBOM generation and software supply-chain security
@@ -166,94 +305,44 @@ The project will be developed incrementally.
 - [ ] Security automation and developer experience
 - [ ] Security Champions programme
 - [ ] AI-powered security assistant
-- [ ] Security metrics and dashboards
+- [ ] Advanced security metrics and dashboards
 - [ ] Documentation and community release
-
-## Getting Started
-
+Getting Started
 The project is currently under development.
-
-### Prerequisites
-
+Prerequisites
 - Python 3.12+
 - Git
 - Docker Desktop (for container-related demonstrations)
-
-### Run the Django Application Locally
-
+Run the Django Application Locally
 Clone the repository:
-
-```bash
-git clone https://github.com/<your-username>/miniature-enterprise-appsec.git
+git clone https://github.com/Uppili-Security/miniature-enterprise-appsec.git
 cd miniature-enterprise-appsec
-```
-
 Navigate to the backend:
-
-```bash
 cd application/backend
-```
-
 Create and activate a virtual environment:
-
-```bash
 python -m venv .venv
-```
-
 Windows PowerShell:
-
-```powershell
-.\.venv\Scripts\Activate.ps1
-```
-
+.\\.venv\\Scripts\\Activate.ps1
 Install dependencies:
-
-```bash
 pip install -r requirements.txt
-```
-
 Create your environment file:
-
-```powershell
 Copy-Item .env.example .env
-```
-
 Generate a Django secret key:
-
-```powershell
 python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
-```
-
-Add the generated value to `.env`:
-
-```env
+Add the generated value to .env:
 DJANGO_SECRET_KEY=your-generated-secret-key
-```
-
 Apply migrations:
-
-```powershell
 python manage.py migrate
-```
-
 Start the application:
-
-```powershell
 python manage.py runserver
-```
-
 The application will be available at:
-
-```text
 http://127.0.0.1:8000/
-```
-
-The security pipeline is executed through GitHub Actions when changes are pushed or pull requests are opened.
-
-## Security Philosophy
-
+The security pipeline is executed through GitHub Actions when changes
+are pushed or pull requests are opened. The consolidated dashboard can
+be downloaded from the Artifacts section of the corresponding workflow
+run.
+Security Philosophy
 This project follows several core principles:
-
 - Security by design.
 - Shift-left and continuous security.
 - Risk-based vulnerability prioritisation.
@@ -262,27 +351,25 @@ This project follows several core principles:
 - Developer-friendly security controls.
 - Continuous monitoring and improvement.
 - Security automation and measurable outcomes.
+Contributing
+Contributions, suggestions, feature requests, and improvements are
+welcome.
 
-## Contributing
+Whether you are an Application Security Engineer, security researcher,
+developer, or DevSecOps practitioner, you are welcome to contribute.
 
-Contributions, suggestions, feature requests, and improvements are welcome.
+Please open an issue to discuss significant changes before submitting a
+pull request.
+Disclaimer
+This project is intended for educational purposes, security research,
+and as a reference implementation of enterprise-inspired Application
+Security practices.
 
-Whether you are an Application Security Engineer, security researcher, developer, or DevSecOps practitioner, you are welcome to contribute.
+Intentionally vulnerable applications and infrastructure configurations
+are provided strictly for controlled testing environments.
 
-Please open an issue to discuss significant changes before submitting a pull request.
+Do not expose vulnerable components to public networks or deploy
+demonstration configurations in production environments.
 
-## Disclaimer
-
-This project is intended for educational purposes, security research, and as a reference implementation of enterprise-inspired Application Security practices.
-
-Intentionally vulnerable applications and infrastructure configurations are provided strictly for controlled testing environments.
-
-Do not expose vulnerable components to public networks or deploy demonstration configurations in production environments.
-
-The project does not claim to provide a complete production-ready enterprise security platform.
-
-## Licence
-
-Distributed under the Apache License 2.0.
-
-See the `LICENSE` file for details.
+The project does not claim to provide a complete production-ready
+enterprise security platform.
