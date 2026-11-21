@@ -61,22 +61,8 @@ jobs:
     steps:
       - name: Checkout source code
         uses: actions/checkout@v4
-      - name: Check dependency manifests
-        run: |
-          echo "Checking Python dependency manifests..."
-          find application/backend -type f \( \
-            -name "requirements.txt" -o \
-            -name "pyproject.toml" -o \
-            -name "Pipfile.lock" \
-          \) -print
-
-          echo "Checking requirements.txt contents..."
-          cat application/backend/requirements.txt
-
       - name: Scan dependencies with Trivy
         uses: aquasecurity/trivy-action@v0.36.0
-        env:
-          TRIVY_DEBUG: true
         with:
           scan-type: fs
           scan-ref: application/backend/
@@ -85,38 +71,6 @@ jobs:
           format: sarif
           output: trivy-sca.sarif
           exit-code: '0'
-      
-      - name: Debug Trivy filesystem scan
-        run: |
-          echo "Trivy version:"
-          trivy --version
-
-          echo "Python dependency files:"
-          find application/backend -type f -name "requirements*.txt"
-
-          echo "Run direct Trivy scan:"
-          trivy fs \
-            --debug \
-            --scanners vuln \
-            --list-all-pkgs \
-            --format table \
-            application/backend/
-      
-      - name: Inspect Trivy SCA results
-        run: |
-          trivy fs \
-            --scanners vuln \
-            --format json \
-            --output trivy-debug.json \
-            application/backend/
-
-          echo "Trivy vulnerability results:"
-          jq '.Results[]? | {
-            Target: .Target,
-            Type: .Type,
-            Vulnerabilities: .Vulnerabilities
-          }' trivy-debug.json
-
       - name: Upload SCA results to GitHub Code Scanning
         if: always() && hashFiles('trivy-sca.sarif') != ''
         uses: github/codeql-action/upload-sarif@v4
