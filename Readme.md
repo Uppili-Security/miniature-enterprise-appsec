@@ -1,68 +1,113 @@
-Miniature Enterprise AppSec
-An open-source project demonstrating an end-to-end Application Security
-workflow by integrating security testing into CI/CD, consolidating
-findings, and providing actionable security visibility.
-Architecture
 
-Editable diagram:
-[`appsec-architecture.drawio`](docs/architecture/appsec-architecture.drawio)
-Implemented
-  Security area        Technology                              Status
-  Application          Python, Django, Django REST Framework   Implemented
-CI/CD                GitHub Actions                          Implemented
-SAST                 Semgrep                                 Implemented
-SCA                  Trivy                                   Implemented
-DAST                 OWASP ZAP                               Implemented
-Secrets detection    Gitleaks                                Implemented
-IaC security         Checkov                                 Implemented
-Container security   Trivy                                   Implemented
-Reporting            Python, SARIF, JSON, HTML               Implemented
-Security pipeline
-GitHub Actions runs the security scanners on pushes and pull requests.
-Scanner reports are collected and processed by Python reporting scripts
-into consolidated findings and an interactive HTML dashboard.
+# Miniature Enterprise AppSec
 
-The dashboard provides: - Summary metrics and severity breakdown. -
-Scanner coverage and execution status. - Search and severity/scanner
-filters. - Detailed findings and remediation information.
+An open-source, enterprise-inspired Application Security ecosystem demonstrating how organisations integrate security into the Software Development Life Cycle (SDLC).
 
-Download the enterprise-security-dashboard artifact from the relevant
-Actions run (14-day retention).
-Demonstration application
-The Django application includes authentication, project/task APIs, and
-intentionally vulnerable scenarios for security testing, including SQL
-injection, XSS, SSRF, path traversal, command injection, insecure
-deserialization, BOLA, and BFLA.
-Warning: This application is for isolated security testing only.
-Do not expose it publicly or deploy it to production.
+This project brings together open-source security tools, DevSecOps practices, vulnerability management, automation, and security reporting into a unified environment.
 
-Roadmap
-The next phase focuses exclusively on strengthening security enforcement
-and developer feedback.
+---
+
+## Architecture
+
+![Miniature Enterprise AppSec Architecture](docs/architecture/appsec-architecture.png)
+
+<details>
+<summary>View editable architecture diagram</summary>
+
+[Open architecture diagram](docs/architecture/appsec-architecture.drawio)
+
+</details>
+
+---
+
+## Implemented
+
+| Component | Technology |
+|---|---|
+| Demo Application | Django, Django REST Framework |
+| CI/CD | GitHub Actions |
+| SAST | Semgrep |
+| SCA | Trivy |
+| DAST | OWASP ZAP |
+| Secret Scanning | Gitleaks |
+| IaC Security | Checkov |
+| Container Security | Trivy |
+| Security Reporting | Python, SARIF, JSON, HTML |
+
+---
+
+## Security Pipeline
+
+The GitHub Actions workflow executes security scans on pushes and pull requests.
+
+Scan results are collected, normalised, and consolidated into a central security report.
+
+The reporting pipeline generates an interactive HTML dashboard containing:
+
+- Overall vulnerability summary
+- Severity distribution
+- Scanner coverage and execution status
+- Searchable security findings
+- Severity and scanner filtering
+- Detailed finding information
+
+The dashboard is uploaded as a GitHub Actions artifact.
+
+**Artifact:** `enterprise-security-dashboard`  
+**Retention:** 14 days
+
+---
+
+## Vulnerable Demo Application
+
+The Django application contains intentionally vulnerable scenarios to demonstrate security testing and detection capabilities.
+
+### Security Scenarios
+
+- SQL Injection
+- Cross-Site Scripting (XSS)
+- Server-Side Request Forgery (SSRF)
+- Path Traversal
+- Command Injection
+- Insecure Deserialization
+- Broken Object-Level Authorization (BOLA)
+- Broken Function-Level Authorization (BFLA)
+
+> ⚠️ This application is intentionally vulnerable and is designed exclusively for local testing and security education. Do not deploy it to production or expose it to the public internet.
+
+---
+
+## Roadmap
+
+### Security Pipeline Enhancements
+
 - [ ] Security quality gates
 - [ ] Pull request security feedback
 - [ ] Baseline-aware scanning
 - [ ] Suppression and exception management
 - [ ] GitHub Code Scanning integration
 - [ ] Branch protection enforcement
-Getting started
-Prerequisites
-- Python 3.12+
-- Git
-- Docker Desktop (for container testing)
-Run the application
-git clone https://github.com/Uppili-Security/miniature-enterprise-appsec.git
-cd miniature-enterprise-appsec/application/backend
 
-python -m venv .venv
-Activate the virtual environment (PowerShell):
-.\.venv\Scripts\Activate.ps1
-Install dependencies and run:
-pip install -r requirements.txt
-python manage.py migrate
-python manage.py runserver
-Visit http://127.0.0.1:8000/.
-Disclaimer
-This project is an educational and reference implementation of
-enterprise-inspired AppSec practices. Intentionally vulnerable
-components are provided for controlled testing only.
+---
+
+## Getting Started
+
+Clone the repository:
+
+```bash
+git clone https://github.com/Uppili-Security/miniature-enterprise-appsec.git
+
+cd miniature-enterprise-appsec
+```
+
+Run the application locally and execute the security pipeline through GitHub Actions.
+
+Refer to the project structure and workflow files for configuration and implementation details.
+
+---
+
+## Disclaimer
+
+This project is intended for educational purposes and to demonstrate practical Application Security engineering practices.
+
+All vulnerabilities within the demo application are intentional.
