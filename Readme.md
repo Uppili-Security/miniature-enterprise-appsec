@@ -9,7 +9,7 @@ This project brings together open-source security tools, DevSecOps practices, vu
 
 ## Architecture
 
-![Miniature Enterprise AppSec Architecture](appsec-architecture.png)
+![Miniature Enterprise AppSec Architecture](main/Miniature%20Enterprise%20AppSec%20Pipeline.png)
 
 <details>
 <summary>View editable architecture diagram</summary>
