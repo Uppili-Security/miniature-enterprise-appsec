@@ -9,14 +9,7 @@ This project brings together open-source security tools, DevSecOps practices, vu
 
 ## Architecture
 
-![Miniature Enterprise AppSec Architecture](Miniature%20Enterprise%20AppSec%20Pipeline.png)
-
-<details>
-<summary>View editable architecture diagram</summary>
-
-[Open architecture diagram](docs/architecture/appsec-architecture.drawio)
-
-</details>
+![Miniature Enterprise AppSec Pipeline](Miniature%20Enterprise%20AppSec%20Pipeline.png)
 
 ---
 
@@ -77,6 +70,92 @@ The Django application contains intentionally vulnerable scenarios to demonstrat
 
 ---
 
+## Getting Started
+
+### Prerequisites
+
+- Python 3.12+
+- Git
+
+### Clone the Repository
+
+```bash
+git clone https://github.com/Uppili-Security/miniature-enterprise-appsec.git
+
+cd miniature-enterprise-appsec
+```
+
+### Run the Application Locally
+
+Navigate to the Django backend:
+
+```bash
+cd application/backend
+```
+
+Create a virtual environment:
+
+```bash
+python3 -m venv .venv
+```
+
+Activate the virtual environment:
+
+```bash
+source .venv/bin/activate
+```
+
+Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+Apply database migrations:
+
+```bash
+python manage.py migrate
+```
+
+Start the development server:
+
+```bash
+python manage.py runserver
+```
+
+The application will be available at:
+
+http://127.0.0.1:8000/
+
+To stop the server, press `Ctrl+C`.
+
+To deactivate the virtual environment:
+
+```bash
+deactivate
+```
+
+---
+
+## Running the Security Pipeline
+
+The security scanning workflow is executed through GitHub Actions.
+
+Scans are triggered when code is pushed or a pull request is created.
+
+The workflow executes the configured security scanners, consolidates their findings, and generates an interactive security dashboard.
+
+### View Security Reports
+
+1. Navigate to the repository on GitHub.
+2. Open the **Actions** tab.
+3. Select the completed security workflow run.
+4. Scroll to the **Artifacts** section.
+5. Download `enterprise-security-dashboard`.
+6. Extract the artifact and open the HTML dashboard in your browser.
+
+---
+
 ## Roadmap
 
 ### Security Pipeline Enhancements
@@ -87,22 +166,6 @@ The Django application contains intentionally vulnerable scenarios to demonstrat
 - [ ] Suppression and exception management
 - [ ] GitHub Code Scanning integration
 - [ ] Branch protection enforcement
-
----
-
-## Getting Started
-
-Clone the repository:
-
-```bash
-git clone https://github.com/Uppili-Security/miniature-enterprise-appsec.git
-
-cd miniature-enterprise-appsec
-```
-
-Run the application locally and execute the security pipeline through GitHub Actions.
-
-Refer to the project structure and workflow files for configuration and implementation details.
 
 ---
 
