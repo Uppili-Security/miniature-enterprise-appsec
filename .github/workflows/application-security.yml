@@ -346,6 +346,15 @@ jobs:
           python security-reporting/generate_report.py \
             --input security-reporting/scan-reports \
             --output security-reporting/parsed-findings.json
+          # Upload consolidated findings for quality-gate evaluation
+      - name: Upload consolidated findings
+        if: always() && hashFiles('security-reporting/parsed-findings.json') != ''
+        uses: actions/upload-artifact@v4
+        with:
+         name: consolidated-security-findings
+         path: security-reporting/parsed-findings.json
+         if-no-files-found: error
+         retention-days: 14
 
       # Generate HTML dashboard
       - name: Generate HTML dashboard
