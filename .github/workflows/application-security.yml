@@ -395,6 +395,10 @@ jobs:
           echo "::error::Reporting job failed. Quality gate cannot evaluate findings."
           exit 1
 
+      - name: Checkout repository
+        if: needs.reporting.result == 'success'
+        uses: actions/checkout@v4
+
       - name: Download consolidated findings
         if: needs.reporting.result == 'success'
         uses: actions/download-artifact@v4
