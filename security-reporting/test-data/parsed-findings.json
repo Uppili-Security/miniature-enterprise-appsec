@@ -1,0 +1,37 @@
+{
+    "summary": {
+        "total_findings": 3
+    },
+    "scanners": [
+        {
+            "scanner": "Semgrep",
+            "status": "completed_with_findings",
+            "findings": 2
+        },
+        {
+            "scanner": "Trivy SCA",
+            "status": "completed_with_findings",
+            "findings": 1
+        }
+    ],
+    "findings": [
+        {
+            "scanner": "Semgrep",
+            "title": "SQL Injection",
+            "severity": "Medium",
+            "file": "application/backend/views.py"
+        },
+        {
+            "scanner": "Semgrep",
+            "title": "Cross-Site Scripting",
+            "severity": "Low",
+            "file": "application/backend/views.py"
+        },
+        {
+            "scanner": "Trivy SCA",
+            "title": "Outdated package",
+            "severity": "Medium",
+            "file": "requirements.txt"
+        }
+    ]
+}
